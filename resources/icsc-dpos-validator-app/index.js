@@ -20,14 +20,17 @@ function initWalletProvider() {
   }
 
   logger.info(`initWalletProvider`)
-  const keystoreDir = path.join(configDir, 'keys', networkName)
+  const keystoreDir =
+    process.env.KEYSTORE_DIR || path.join(configDir, 'keys', networkName)
+  const passwordFile =
+    process.env.PASSWORD_FILE || path.join(configDir, 'pass.pwd')
   let keystore
   fs.readdirSync(keystoreDir).forEach(file => {
     if (file.startsWith('UTC')) {
       keystore = fs.readFileSync(path.join(keystoreDir, file)).toString()
     }
   })
-  let password = fs.readFileSync(path.join(configDir, 'pass.pwd')).toString().trim()
+  let password = fs.readFileSync(passwordFile).toString().trim()
   let wallet = EthWallet.fromV3(keystore, password)
   let pkey = wallet.getPrivateKeyString()
   walletProvider = new HDWalletProvider({

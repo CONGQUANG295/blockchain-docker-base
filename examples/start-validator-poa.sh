@@ -1,0 +1,1 @@
+./geth --datadir mnode1 -snapshot=false --gcmode=archive -unlock '0xe5E34F663eb042553a130F2b3Bbae23F3655384d' --password ./password.txt --mine --miner.etherbase='0xe5E34F663eb042553a130F2b3Bbae23F3655384d' --config config.toml --allow-insecure-unlock --cache=1024

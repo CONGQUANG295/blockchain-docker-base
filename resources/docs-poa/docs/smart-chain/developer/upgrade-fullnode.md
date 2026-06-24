@@ -1,0 +1,34 @@
+# How to Upgrade Geth
+
+Updating `geth` is as easy as it gets. You just need to download and install the newer version of `geth`, shutdown your node and restart with the new software. Geth will automatically use the data of your old node and sync the latest blocks that were mined since you shutdown the old software.
+
+## Step 1: Compile the new version
+
+```bash
+git clone https://github.com/${githubusername}/${githubrepo}
+# Enter the folder ${name} was cloned into
+cd ${name}
+# Comile and install ${name}
+make geth
+```
+
+
+## Step 2: Stop Geth
+
+```
+
+$ pid=`ps -ef | grep geth | grep -v grep | awk '{print $2}'`
+
+$ kill  $pid
+
+```
+
+
+## Step 3: Restart
+
+
+
+```bash
+## start a full node
+geth --config ./config.toml --datadir ./node --syncmode snap
+```

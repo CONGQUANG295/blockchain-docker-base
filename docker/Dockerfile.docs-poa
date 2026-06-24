@@ -1,0 +1,16 @@
+FROM python:3.8.10-alpine3.13
+
+WORKDIR /app
+
+RUN apk --no-cache --update add bash
+
+RUN pip install --upgrade pip
+
+RUN pip install mkdocs mkdocs-material
+
+ADD resources/docs-poa/ ./
+
+RUN cp .env.example .env
+
+RUN chmod +x *.sh
+

@@ -1,0 +1,27 @@
+FROM openethereum/openethereum:v3.3.5 AS oe
+
+FROM alpine:3.16.0
+
+WORKDIR /app
+
+RUN apk --no-cache --update add \
+  gcompat \
+  libc6-compat \
+  libstdc++ \
+  libgcc \
+  bash \
+  curl \
+  jq \
+  openssl
+
+RUN ln -s /lib/libc.so.6 /usr/lib/libresolv.so.2
+
+COPY --from=oe /home/openethereum/openethereum /app/openethereum
+RUN chmod +x /app/openethereum
+
+RUN mkdir data
+
+RUN echo -n 'muoJNif6zc8FTEI' >> node.pwd
+
+ADD entrypoints/node ./entrypoints
+ADD entrypoints/dpos ./entrypoints/dpos

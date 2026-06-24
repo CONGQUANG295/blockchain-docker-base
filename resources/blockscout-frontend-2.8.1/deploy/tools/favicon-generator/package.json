@@ -1,0 +1,11 @@
+{
+  "name": "favicon-generator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "description": "",
+  "dependencies": {
+    "favicons": "^7.2.0"
+  }
+}

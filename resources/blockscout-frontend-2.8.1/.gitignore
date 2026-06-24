@@ -1,0 +1,77 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/node_modules_linux
+/**/node_modules_linux
+/.pnp
+.pnp.js
+.pnpm-store
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+/public/assets/envs.js
+/public/assets/configs
+/public/assets/multichain
+/public/assets/essential-dapps
+/public/icons/sprite.svg
+/public/icons/sprite.*.svg
+/public/icons/registry.json
+/public/icons/README.md
+/public/static/og_image.png
+/public/sitemap.xml
+/public/robots.txt
+/public/llms.txt
+/analyze
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+.tools
+grafana
+.zed
+.sbx
+
+# debug
+npm-debug.log*
+.pnpm-debug.log*
+
+# local env files
+# NOTE: .env.extra is intentionally NOT ignored — it is committed so branch/feature ENVs
+# reach the demo deploy. Purely-local overrides go in .env.local (matched by .env*.local below).
+.env*.local
+/.env.secrets
+.env.tmp
+
+# compiled dev-server fetch script
+/tools/dev-server/fetch.js
+
+# typescript
+*.tsbuildinfo
+
+.eslintcache
+
+**.decrypted~**
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.browser/
+/playwright/envs.js
+/playwright/affected-tests.txt
+
+**.dec**
+
+# build outputs
+/toolkit/package/dist
+license.json
+release-prs-data.json
+
+.ai

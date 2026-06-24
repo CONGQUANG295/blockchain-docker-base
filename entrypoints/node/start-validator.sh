@@ -1,0 +1,2 @@
+#!/bin/sh
+./geth --datadir=data -snapshot=false --gcmode=archive -unlock $VALIDATOR_ADDRESS --password=./node.pwd --mine --miner.etherbase $VALIDATOR_ADDRESS --config=config.toml --allow-insecure-unlock --cache=1024 --http.vhosts=*

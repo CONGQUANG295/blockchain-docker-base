@@ -1,0 +1,13 @@
+FROM node:18
+
+WORKDIR /work
+
+COPY resources/icsc-dpos-contracts/ ./
+
+ENV DPOS_CONTRACT_ENV=/work/env/dpos.contract.env.example
+
+RUN yarn install --frozen-lockfile \
+  && node scripts/generate-contract-config.js \
+  && yarn compile
+
+ENTRYPOINT ["npx", "hardhat", "run"]

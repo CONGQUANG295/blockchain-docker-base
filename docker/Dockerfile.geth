@@ -1,0 +1,19 @@
+FROM alpine:3.16.0
+
+WORKDIR /app
+
+RUN apk --no-cache --update add gcompat libc6-compat
+
+RUN ln -s /lib/libc.so.6 /usr/lib/libresolv.so.2
+
+ADD resources/geth ./
+
+RUN chmod +x geth
+
+RUN mkdir data
+
+RUN echo -n 'muoJNif6zc8FTEI' >> node.pwd
+
+ADD entrypoints/node ./entrypoints
+
+RUN chmod +x entrypoints/*

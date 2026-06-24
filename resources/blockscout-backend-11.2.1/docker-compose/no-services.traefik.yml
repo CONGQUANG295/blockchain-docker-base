@@ -1,0 +1,74 @@
+version: '3.9'
+
+# Minimal Blockscout stack + Traefik (backend, frontend, db, redis only).
+#
+# Setup:
+#   ./scripts/prepare-traefik.sh
+#   docker compose -f no-services.traefik.yml up -d --build
+
+services:
+  traefik:
+    extends:
+      file: ./services/traefik.yml
+      service: traefik
+
+  redis-db:
+    extends:
+      file: ./services/redis.yml
+      service: redis-db
+    networks:
+      - blockscout-proxy
+
+  db-init:
+    extends:
+      file: ./services/db.yml
+      service: db-init
+
+  db:
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    extends:
+      file: ./services/db.yml
+      service: db
+    ports: !override []
+    networks:
+      - blockscout-proxy
+
+  backend:
+    depends_on:
+      - db
+      - redis-db
+    extends:
+      file: ./services/backend-local.yml
+      service: backend
+    links:
+      - db:database
+    environment:
+      ETHEREUM_JSONRPC_HTTP_URL: ${ETHEREUM_JSONRPC_HTTP_URL:-http://host.docker.internal:8545/}
+      ETHEREUM_JSONRPC_TRACE_URL: ${ETHEREUM_JSONRPC_TRACE_URL:-http://host.docker.internal:8545/}
+      ETHEREUM_JSONRPC_WS_URL: ${ETHEREUM_JSONRPC_WS_URL:-ws://host.docker.internal:8545/}
+      CHAIN_ID: ${CHAIN_ID:-1337}
+      ETHEREUM_JSONRPC_VARIANT: ${ETHEREUM_JSONRPC_VARIANT:-geth}
+      BLOCK_TRANSFORMER: ${BLOCK_TRANSFORMER:-base}
+    expose:
+      - 4000
+    networks:
+      - blockscout-proxy
+
+  frontend:
+    depends_on:
+      - backend
+    extends:
+      file: ./services/frontend-local.yml
+      service: frontend
+    env_file:
+      - ./envs/common-frontend.env
+    expose:
+      - 3000
+    networks:
+      - blockscout-proxy
+
+networks:
+  blockscout-proxy:
+    name: blockscout-proxy

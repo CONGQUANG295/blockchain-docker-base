@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  frontend:
+    image: blockscout-frontend:2.8.1
+    pull_policy: never
+    platform: linux/amd64
+    restart: always
+    container_name: frontend
+    build:
+      context: ../../../blockscout-frontend-2.8.1
+      dockerfile: Dockerfile

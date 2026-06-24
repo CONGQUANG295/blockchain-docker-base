@@ -1,0 +1,94 @@
+{
+  "registry": "docker.io",
+  "imagePrefix": "blockchain-dock",
+  "images": [
+    {
+      "name": "openethereum",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.openethereum",
+      "context": "."
+    },
+    {
+      "name": "validator-app",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.validator-app",
+      "context": "."
+    },
+    {
+      "name": "dpos-deployer",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.dpos-deployer",
+      "context": "."
+    },
+    {
+      "name": "bootnode",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.bootnode",
+      "context": "."
+    },
+    {
+      "name": "geth",
+      "version": "1.13.8",
+      "dockerfile": "docker/Dockerfile.geth",
+      "context": "."
+    },
+    {
+      "name": "netstats-api",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.netstats-api",
+      "context": "."
+    },
+    {
+      "name": "netstats-dashboard",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.netstats-dashboard",
+      "context": "."
+    },
+    {
+      "name": "eth-faucet",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.eth-faucet",
+      "context": "."
+    },
+    {
+      "name": "docs-poa",
+      "version": "0.0.1",
+      "dockerfile": "docker/Dockerfile.docs-poa",
+      "context": "."
+    },
+    {
+      "name": "blockscout-base",
+      "version": "4.1.8",
+      "dockerfile": "docker/Dockerfile.blockscout-base-4.1.8",
+      "context": "."
+    },
+    {
+      "name": "blockscout-base",
+      "version": "5.2.2",
+      "dockerfile": "docker/Dockerfile.blockscout-base-5.2.2",
+      "context": "."
+    },
+    {
+      "name": "blockscout-frontend",
+      "version": "1.29.2",
+      "dockerfile": "docker/Dockerfile.blockscout-frontend",
+      "context": "."
+    },
+    {
+      "name": "blockscout-backend",
+      "version": "11.2.1",
+      "dockerfile": "resources/blockscout-backend-11.2.1/docker/Dockerfile",
+      "context": "resources/blockscout-backend-11.2.1",
+      "buildArgs": {
+        "RELEASE_VERSION": "11.2.1",
+        "BLOCKSCOUT_VERSION": "11.2.1"
+      }
+    },
+    {
+      "name": "blockscout-frontend",
+      "version": "2.8.1",
+      "dockerfile": "resources/blockscout-frontend-2.8.1/Dockerfile",
+      "context": "resources/blockscout-frontend-2.8.1"
+    }
+  ]
+}

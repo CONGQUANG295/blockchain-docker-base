@@ -1,0 +1,15 @@
+FROM alpine:3.16.0
+
+WORKDIR /app
+
+RUN apk --no-cache --update add gcompat
+
+ADD resources/bootnode ./
+
+RUN chmod +x bootnode
+
+RUN mkdir data
+
+ADD entrypoints/bootnode ./entrypoints
+
+RUN chmod +x entrypoints/*

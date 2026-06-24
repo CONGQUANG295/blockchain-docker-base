@@ -1,0 +1,43 @@
+environments:
+  {{ .Environment.Name }}:
+    values:
+      # Overridden per-deploy via `helmfile --state-values-set envsPreset=<alias>`.
+      # Read in values/*/values.yaml.gotmpl and passed to the container as ENVS_PRESET.
+      - envsPreset: none
+---
+helmDefaults:
+  timeout: 600
+  kubeContext: k8s-dev
+  wait: true
+  recreatePods: false
+
+repositories:
+  - name: blockscout
+    url: https://blockscout.github.io/helm-charts
+  - name: bedag
+    url: https://bedag.github.io/helm-charts
+
+---
+releases:
+  # Deploy demo 2 - for case when ENVs validator needs to be disabled (for example, multichain)
+  - name: bs-stack
+    chart: blockscout/blockscout-stack
+    version: 1.*.*
+    namespace: review-2-{{ requiredEnv "GITHUB_REF_NAME_SLUG" }}
+    labels:
+      app: review-2-{{ requiredEnv "GITHUB_REF_NAME_SLUG" }}
+    values:
+    - values/review-2/values.yaml.gotmpl
+    - global:
+        env: "review"
+  # Deploy demo
+  - name: bs-stack
+    chart: blockscout/blockscout-stack
+    version: 1.*.*
+    namespace: review-{{ requiredEnv "GITHUB_REF_NAME_SLUG" }}
+    labels:
+      app: review-{{ requiredEnv "GITHUB_REF_NAME_SLUG" }}
+    values:
+    - values/review/values.yaml.gotmpl
+    - global:
+        env: "review"

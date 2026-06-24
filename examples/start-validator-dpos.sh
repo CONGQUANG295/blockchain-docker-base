@@ -1,0 +1,1 @@
+./openethereum --config ./nodes/validator1/node.toml

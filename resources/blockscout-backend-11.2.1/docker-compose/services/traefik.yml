@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  traefik:
+    image: traefik:v3.3
+    container_name: blockscout-traefik
+    restart: unless-stopped
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - ${TRAEFIK_HTTP_PORT:-80}:80
+      - ${TRAEFIK_HTTPS_PORT:-443}:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./traefik/letsencrypt:/letsencrypt
+    networks:
+      - blockscout-proxy
+    env_file:
+      - ../envs/traefik.env
+
+networks:
+  blockscout-proxy:
+    name: blockscout-proxy

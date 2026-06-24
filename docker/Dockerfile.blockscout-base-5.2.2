@@ -1,0 +1,39 @@
+FROM hexpm/elixir:1.14.5-erlang-24.2.2-alpine-3.16.0
+
+WORKDIR /app
+
+RUN apk --no-cache --update add alpine-sdk gmp-dev automake autoconf libtool inotify-tools bash nodejs npm
+
+RUN apk --update add libstdc++ curl ca-certificates git
+
+# Cache elixir deps
+ADD resources/blockscout-5.2.2-beta/mix.exs resources/blockscout-5.2.2-beta/mix.lock ./
+ADD resources/blockscout-5.2.2-beta/apps/block_scout_web/mix.exs ./apps/block_scout_web/
+ADD resources/blockscout-5.2.2-beta/apps/explorer/mix.exs ./apps/explorer/
+ADD resources/blockscout-5.2.2-beta/apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
+ADD resources/blockscout-5.2.2-beta/apps/indexer/mix.exs ./apps/indexer/
+
+ENV MIX_HOME=/opt/mix
+RUN mix local.hex --force
+RUN mix do deps.get, local.rebar --force, deps.compile
+
+ADD resources/blockscout-5.2.2-beta/apps ./apps
+ADD resources/blockscout-5.2.2-beta/config ./config
+ADD resources/blockscout-5.2.2-beta/rel ./rel
+ADD resources/blockscout-5.2.2-beta/*.exs ./
+
+# Run forderground build and phoenix digest
+RUN mix compile && npm install npm@latest
+
+# Add blockscout npm deps
+RUN cd apps/block_scout_web/assets/ && \
+    npm install && \
+    npm run deploy && \
+    cd /app/apps/explorer/ && \
+    npm install
+
+RUN mix phx.digest
+
+# Entrypoints
+ADD entrypoints/explorer ./entrypoints
+RUN chmod +x entrypoints/*

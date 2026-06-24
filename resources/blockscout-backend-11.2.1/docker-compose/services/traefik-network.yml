@@ -1,0 +1,57 @@
+version: '3.9'
+
+# Attach Blockscout stack services to Traefik network (internal only, no host ports).
+services:
+  redis-db:
+    networks:
+      - blockscout-proxy
+
+  db:
+    ports: !reset []
+    networks:
+      - blockscout-proxy
+
+  backend:
+    expose:
+      - 4000
+    networks:
+      - blockscout-proxy
+
+  frontend:
+    expose:
+      - 3000
+    networks:
+      - blockscout-proxy
+
+  stats-db:
+    ports: !reset []
+    networks:
+      - blockscout-proxy
+
+  stats:
+    expose:
+      - 8050
+    networks:
+      - blockscout-proxy
+
+  visualizer:
+    expose:
+      - 8050
+    networks:
+      - blockscout-proxy
+
+  sig-provider:
+    networks:
+      - blockscout-proxy
+
+  nft_media_handler:
+    networks:
+      - blockscout-proxy
+
+  user-ops-indexer:
+    networks:
+      - blockscout-proxy
+
+networks:
+  blockscout-proxy:
+    name: blockscout-proxy

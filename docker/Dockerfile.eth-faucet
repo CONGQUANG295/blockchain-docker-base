@@ -1,0 +1,15 @@
+FROM node:18.20.1-alpine3.18
+
+WORKDIR /app
+
+RUN apk --no-cache --update add bash go ca-certificates
+
+ADD resources/eth-faucet/ ./
+
+RUN npm run build
+
+RUN go build -o eth-faucet
+
+# Entrypoints
+ADD entrypoints/eth-faucet ./entrypoints
+RUN chmod +x entrypoints/*

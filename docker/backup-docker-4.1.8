@@ -1,0 +1,64 @@
+FROM hexpm/elixir:1.13.1-erlang-24.1.3-alpine-3.16.0
+
+WORKDIR /app
+
+RUN apk --no-cache --update add alpine-sdk gmp-dev automake libtool inotify-tools bash nodejs npm
+
+RUN apk --update add curl ca-certificates git
+
+# Get Rust
+RUN curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
+RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+ENV PATH="/root/.cargo/bin:${PATH}" \
+    RUSTFLAGS="-C target-feature=-crt-static"
+# SHELL [ "/bin/sh", "-s", ".", "$HOME/.cargo/env" ]
+
+# # Cache elixir deps
+ADD blockscout-4.1.8-beta/mix.exs ./blockscout-4.1.8-beta/mix.lock ./
+ADD blockscout-4.1.8-beta/apps/block_scout_web/mix.exs ./apps/block_scout_web/
+ADD blockscout-4.1.8-beta/apps/explorer/mix.exs ./apps/explorer/
+ADD blockscout-4.1.8-beta/apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
+ADD blockscout-4.1.8-beta/apps/indexer/mix.exs ./apps/indexer/
+
+ENV MIX_HOME=/opt/mix
+RUN mix local.hex --force
+RUN mix deps.update libsecp256k1
+RUN mix do deps.get, local.rebar --force, deps.compile, compile
+
+ADD blockscout-4.1.8-beta/apps ./apps
+ADD blockscout-4.1.8-beta/config ./config
+ADD blockscout-4.1.8-beta/rel ./rel
+ADD blockscout-4.1.8-beta/*.exs ./
+
+# Run forderground build and phoenix digest
+RUN mix compile && npm install npm@latest
+
+# Add blockscout npm deps
+RUN cd apps/block_scout_web/assets/ && \
+    npm install && \
+    npm run deploy && \
+    cd /app/apps/explorer/ && \
+    npm install
+
+RUN mix phx.digest
+
+# Entrypoints
+ADD entrypoints ./entrypoints
+
+# # Get Nodejs
+# RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+# RUN echo 'export NVM_DIR="$HOME/.nvm"' >> "$HOME/.bashrc"
+# RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm' >> "$HOME/.bashrc"
+# RUN echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"' >> "$HOME/.bashrc"
+
+# # Install python3.8
+# RUN apk --no-cache --update add zlib-dev bzip2-dev openssl-dev libffi-dev libstdc++
+# RUN wget https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tgz && \
+#     tar -xzf Python-3.8.2.tgz && \ 
+#     cd Python-3.8.2 && \
+#     ./configure  --enable-optimizations && \
+#     make install && \
+#     cd .. && \
+#     rm -rf Python-3.8.2 Python-3.8.2.tgz
+# # RUN bash -c 'source $HOME/.nvm/nvm.sh && nvm install 14.16.1'
+# # RUN

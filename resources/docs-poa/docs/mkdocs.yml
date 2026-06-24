@@ -1,0 +1,112 @@
+site_name: ${Name Chain} Docs
+site_description: ${Name Chain} Technology Documentation
+site_author: ${Name Chain} Community
+
+site_url: https://docs.${domainchain}
+use_directory_urls: false
+theme:
+  name: material
+
+repo_name: ${name}
+repo_url: https://github.com/${githubusername}/${githubrepo}
+
+nav:
+  - Home: index.md
+  - ${Name Chain}:
+    - Introduction: smart-chain/guides/${name}-intro.md
+    - Concepts:
+      - Consensus: smart-chain/guides/concepts/consensus.md
+      - Comparison: smart-chain/guides/general.md
+      - Genesis File: smart-chain/guides/concepts/genesis.md
+      - System Contract: smart-chain/guides/concepts/system-contract.md
+      - Governance: smart-chain/guides/concepts/${name}-gov.md
+    - Ecosystem: https://github.com/${githubusername}/${name}-ecosystem
+    - Gnosis: smart-chain/developer/gnosis.md
+    - Staking:
+      - Validator:
+        - Overview: smart-chain/validator/overview.md
+        - Validator Guides: smart-chain/validator/guideline.md
+        - Validator Security: smart-chain/validator/security.md
+        - Chaindata Snapshot: smart-chain/developer/snapshot.md       
+        - Testnet : smart-chain/validator/testnet.md
+        - Validator FAQ: faq/${name}/val.md
+      - Delegator Guide: smart-chain/delegator/del-guide.md
+    - Cross Chain Apps: smart-chain/guides/cross-chain.md
+    - ${Name Chain} Mainnet Explorer: https://explorer.${domainchain}/
+    - ${Name Chain} Testnet Explorer: https://testnet-explorer.${domainchain}/
+    - Wallet: smart-chain/wallet.md
+  - ${Name} Developers:
+    - General:
+      - Create Wallet: smart-chain/developer/create-wallet.md
+      - Smart Contract: https://solidity.readthedocs.io/en/v0.7.1/
+      - Remix : https://remix.ethereum.org/
+      - Web3JS: https://web3js.readthedocs.io/en/v1.2.11/
+      - Truffle: https://www.trufflesuite.com/docs/teams/quickstart
+    - Ecosystem: https://github.com/${githubusername}/${name}-develop-ecosystem
+    - Deploy:
+      - Remix: smart-chain/developer/deploy/remix.md
+      - Truffle: smart-chain/developer/deploy/truffle.md
+      - Truffle Verify: smart-chain/developer/deploy/truffle-verify.md
+      - HardHat: smart-chain/developer/deploy/hardhat.md
+      - HardHat Verify: smart-chain/developer/deploy/hardhat-verify.md
+      - Verify Proxy Contract: smart-chain/developer/upgrade/verify-proxy.md
+    - Tools:
+      - Faucet: https://faucet.${domainchain}
+      - Gas Price: https://${domainchain}/chart/gasprice
+      - Wallet Provider for DApps: smart-chain/wallet/arkane-developer.md
+    - ${TOKENSTANDARD}20 Tokens:
+      - Introduction: smart-chain/developer/${TOKENSTANDARD}20.md
+      - Issue Token: smart-chain/developer/issue-${TOKENSTANDARD}20.md
+      - Bind Token:
+        - Introduction: smart-chain/developer/bind/tokens-cross-chain.md
+        - Bind Token: smart-chain/developer/bind/bind-tokens.md
+        - Mirror Token: smart-chain/developer/bind/mirror.md
+        - Sync Supply: smart-chain/developer/bind/sync.md
+      - Cross-chain Transfer: smart-chain/developer/cross-chain-transfer.md
+      - Bind Token Tool:https://github.com/${githubusername}/token-bind-tool
+    - Blockchain Details:
+      - ${Name Chain} Fullnode: smart-chain/developer/fullnode.md
+      - Chaindata Snapshot: smart-chain/developer/snapshot.md
+      - ${Name} Relayer: smart-chain/developer/${symbol}-relayer.md
+      - RPC: smart-chain/developer/rpc.md
+    - Oracles:
+      - Band Protocol Integration: smart-chain/developer/oracle/band.md
+      - Chainlink Protocol Integration: smart-chain/developer/oracle/link.md
+      - Chainlink Protocol VRF: https://docs.chain.link/docs/chainlink-vrf
+    - Tutorial:
+      - Deploy NFT:  smart-chain/developer/${TOKENSTANDARD}721.md
+      - Verify Contract on domainchain: smart-chain/developer/deploy/verify.md
+      - Local ${Name} Network: smart-chain/developer/deploy/local.md
+      - Proxy Contract: smart-chain/developer/upgrade/proxy.md
+    - BUIDL Program: https://www.${domainchain}/en/blog/421499824684900972/Bridging-DeFi-and-CeFi-Introducing-a-$100M-Support-Fund-for-DeFi-Projects-on-${Name}-Smart-Chain
+  - Wallets:
+    - ${Name Chain} Wallet Support: smart-chain/wallet.md
+    - ${Name Chain} Wallet Tutorial:
+      - How to create a ${Name} wallet: smart-chain/wallet/arkane.md
+      - Math Wallet User Guide: smart-chain/wallet/math-resource.md
+      - Staking with extension wallet: smart-chain/wallet/staking.md
+      - How to install ${Name} Extension Wallet Manually: smart-chain/wallet/manual.md
+      - How to use ezDeFi Wallet for ${Name Chain}: smart-chain/wallet/ezdefi.md
+  - ${Name Chain} Explorer: https://explorer.${domainchain}
+  - ${Name Chain} Forum: https://community.${domainchain}/
+  - ${Name Chain} Faucet: https://faucet.${domainchain}
+  - The ${Name Chain} Developer Group : https://t.me/${Name}
+  - The ${Name Chain} Telegram Group : https://t.me/${Name}
+  - Twitter: https://twitter.com/${name}_exchange
+  - Telegram Announcement Channel English: https://t.me/${Name}News
+  - FAQ:
+    - ${Name Chain} FAQ:
+      - General:
+        - Info: faq/${name}/general.md
+        - ${Name Chain}: faq/${name}/${name}.md
+        - Ecosystem: faq/${name}/eco.md
+      - Token:
+        - Intro: faq/${name}/token.md
+        - ${TOKENSTANDARD}s: faq/${name}/${tokenstandard}.md
+      - Staking:
+        - Validator: faq/${name}/val.md
+        - Delegator: faq/${name}/del.md
+        - Staking parameters: smart-chain/validator/Parameters.md
+      - Crosschain: faq/${name}/cross.md
+    - More Help: resources.md
+    - Contributing: CONTRIBUTING.md

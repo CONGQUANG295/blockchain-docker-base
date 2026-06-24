@@ -93,6 +93,8 @@ export const homepageSchema = yup.object({
           const isUndefined = data === undefined;
           return isUndefined || heroBannerSchema.isValidSync(data);
         }),
+    NEXT_PUBLIC_HOMEPAGE_HERO_TITLE: yup.string(),
+    NEXT_PUBLIC_DPOS_GAUGE_COLOR: yup.string(),
 });
 
 const featuredNetworkSchema: yup.ObjectSchema<FeaturedNetwork> = yup
@@ -199,6 +201,16 @@ export const footerSchema = yup.object({
       .array()
       .json()
       .of(footerLinkGroupSchema),
+    NEXT_PUBLIC_FOOTER_PROJECT_CONFIG: yup
+      .object()
+      .transform(replaceQuotes)
+      .json()
+      .shape({
+        title: yup.string().required(),
+        taglineUrl: yup.string().test(urlTest),
+        description: yup.string(),
+        copyright: yup.string(),
+      }),
 });
 
 const fontFamilySchema: yup.ObjectSchema<FontFamily> = yup

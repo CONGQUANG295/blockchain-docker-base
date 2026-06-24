@@ -1,0 +1,27 @@
+/dist
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+node_modules/
+.env
+!.env*.default
+!.env*.example
+.vscode/*
+!.vscode/settings.json.default
+
+# Hardhat build outputs
+cache/
+artifacts/
+typechain/
+typechain-types/
+
+# Keys / deploy secrets
+keystore/
+
+.yalc
+yalc.lock

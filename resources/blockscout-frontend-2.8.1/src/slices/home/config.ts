@@ -27,6 +27,7 @@ const config = Object.freeze({
   charts: parseEnvJson<Array<ChainIndicatorId>>(getEnvValue('NEXT_PUBLIC_HOMEPAGE_CHARTS')) || [],
   stats: homePageStats,
   heroBanner: parseEnvJson<HeroBannerConfig>(getEnvValue('NEXT_PUBLIC_HOMEPAGE_HERO_BANNER_CONFIG')),
+  heroTitle: getEnvValue('NEXT_PUBLIC_HOMEPAGE_HERO_TITLE') || undefined,
   highlights: getExternalAssetFilePath('NEXT_PUBLIC_HOMEPAGE_HIGHLIGHTS_CONFIG'),
 });
 

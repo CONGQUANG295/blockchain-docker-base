@@ -1,7 +1,7 @@
 {
-  "name": "icsc-dpos-validator-app",
+  "name": "dpos-validator-app",
   "version": "0.1.0",
-  "description": "Validator app for ICSC DPoS chains",
+  "description": "Validator app for DPoS chains",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

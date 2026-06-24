@@ -54,6 +54,10 @@ const HeroBanner = () => {
   };
 
   const text = (() => {
+    if (config.slices.home.heroTitle) {
+      return config.slices.home.heroTitle;
+    }
+
     if (config.slices.home.heroBanner?.text) {
       return config.slices.home.heroBanner.text;
     }

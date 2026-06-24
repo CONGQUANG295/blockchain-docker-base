@@ -2,9 +2,9 @@ FROM node:10
 
 WORKDIR /app
 
-COPY resources/icsc-dpos-validator-app/package.json ./
+COPY resources/dpos-validator-app/package.json ./
 RUN npm install --only=prod
 
-COPY resources/icsc-dpos-validator-app/ ./
+COPY resources/dpos-validator-app/ ./
 
 CMD ["node", "index.js"]

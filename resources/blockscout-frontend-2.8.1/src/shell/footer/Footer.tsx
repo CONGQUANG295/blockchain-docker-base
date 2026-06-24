@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-Blockscout
 
 import type { GridProps, HTMLChakraProps } from '@chakra-ui/react';
-import { Box, Grid, Flex, Text, VStack, HStack } from '@chakra-ui/react';
+import { Box, Grid, Flex, Text, VStack, HStack, Image } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 
@@ -136,6 +136,30 @@ const Footer = () => {
   }, []);
 
   const renderProjectInfo = React.useCallback((gridArea?: GridProps['gridArea']) => {
+    const projectConfig = config.shell.footer.projectConfig;
+
+    if (projectConfig) {
+      return (
+        <Box gridArea={ gridArea }>
+          <Flex alignItems="center" columnGap={ 4 } mb={ 3 }>
+            { config.chain.icon.default && (
+              <Image src={ config.chain.icon.default } w="48px" alt=""/>
+            ) }
+            <Text fontSize="lg" fontWeight={ 600 }>{ projectConfig.title }</Text>
+          </Flex>
+          { projectConfig.taglineUrl && (
+            <Link href={ projectConfig.taglineUrl } external noIcon>{ projectConfig.taglineUrl }</Link>
+          ) }
+          { projectConfig.description && (
+            <Text mt={ 3 } fontSize="xs">{ projectConfig.description }</Text>
+          ) }
+          { projectConfig.copyright && (
+            <Text mt={ 6 } fontSize="xs">{ projectConfig.copyright }</Text>
+          ) }
+        </Box>
+      );
+    }
+
     const logoColor = { base: 'blue.600', _dark: 'white' };
 
     return (

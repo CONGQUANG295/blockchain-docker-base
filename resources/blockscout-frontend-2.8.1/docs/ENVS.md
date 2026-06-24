@@ -303,6 +303,7 @@ Operator-supplied favicon override. The app ships with the generic Blockscout fa
 | Variable | Type | Description | Compulsoriness | Default value | Example value | Version |
 | --- | --- | --- | --- | --- | --- | --- |
 | NEXT_PUBLIC_FOOTER_LINKS | `string` | URL of configuration file (`.json` format only) or file content string representation. It contains list of link groups to be displayed in the footer. See [below](#footer-links-configuration-properties) list of available properties for particular group | - | - | `https://example.com/footer_links_config.json` \| `[{'title':'My chain','links':[{'text':'About','url':'https://example.com/about'},{'text':'Contacts','url':'https://example.com/contacts'}]}]` | v1.1.1+ |
+| NEXT_PUBLIC_FOOTER_PROJECT_CONFIG | `JSON` | Custom footer project column (title, taglineUrl, description, copyright). When set, replaces the default "Made with Blockscout" column. Uses `NEXT_PUBLIC_NETWORK_ICON` for logo. | - | - | `{"title":"Powered by GTBS","taglineUrl":"https://gtbs.org","description":"...","copyright":"GTBS © 2024"}` | Custom |
 
 The app version shown in the footer is derived from build-time ENV variables `NEXT_PUBLIC_GIT_TAG` and `NEXT_PUBLIC_GIT_COMMIT_SHA` and cannot be overwritten at run-time.
 
@@ -449,6 +450,10 @@ Also, be aware that if you customize the name of the currency or any of its deno
 | NEXT_PUBLIC_NETWORK_SHORT_NAME | `string` | Used for SEO attributes (e.g, page description) | - | - | `OoG` | v1.0.x+ |
 | NEXT_PUBLIC_NETWORK_ID | `number` | Chain id, see [https://chainlist.org](https://chainlist.org) for the reference | Required (except for multichain) | - | `99` | v1.0.x+ |
 | NEXT_PUBLIC_NETWORK_RPC_URL | `string \| Array<string>` | Chain public RPC server url, see [https://chainlist.org](https://chainlist.org) for the reference. Can contain a single string value, or an array of urls. | - | - | `https://core.poa.network` | v1.0.x+ |
+| NEXT_PUBLIC_CONSENSUS_ADDRESS | `string` | DPoS consensus contract address. When set (with `NEXT_PUBLIC_NETWORK_RPC_URL`), enables on-chain homepage widgets (staked, validators, cycle). | - | - | `0x1234...abcd` | Custom |
+| NEXT_PUBLIC_BLOCK_TIME_SECONDS | `number` | Block time in seconds for DPoS cycle countdown and gauge. Should match chain `BLOCK_TIME_SECONDS`. | - | `5` | `5` | Custom |
+| NEXT_PUBLIC_VALIDATORS_STATUS_URL | `string` | Optional URL for the Active Validators stats widget link. | - | - | `https://status.example.com` | Custom |
+| NEXT_PUBLIC_DPOS_GAUGE_COLOR | `string` | CSS color for the DPoS cycle progress gauge. | - | `#FFC107` | `#FFC107` | Custom |
 | NEXT_PUBLIC_NETWORK_CURRENCY_NAME | `string` | Network currency name | - | - | `Ether` | v1.0.x+ |
 | NEXT_PUBLIC_NETWORK_CURRENCY_WEI_NAME | `string` | Name of the smallest unit of the native currency (e.g., 'wei' for Ethereum, where 1 ETH = 10^18 wei). Used for displaying gas prices and transaction fees in the smallest denomination. | - | `wei` | `duck` | v1.23.0+ |
 | NEXT_PUBLIC_NETWORK_CURRENCY_GWEI_NAME | `string` | Name of the giga-unit of the native currency (e.g., 'gwei' for Ethereum, where 1 gwei = 10^9 of the smallest unit). Used for displaying gas prices in a more readable format throughout the UI. | - | `gwei` | `gDuck` | v2.5.0+ |
@@ -495,6 +500,7 @@ Also, be aware that if you customize the name of the currency or any of its deno
 | NEXT_PUBLIC_HOMEPAGE_CHARTS | `Array<'daily_txs' \| 'daily_operational_txs' \| 'coin_price'  \| 'secondary_coin_price' \| 'market_cap' \| 'tvl'>` | List of charts displayed on the home page | - | - | `['daily_txs','coin_price','market_cap']` | v1.0.x+ |
 | NEXT_PUBLIC_HOMEPAGE_STATS | `Array<'latest_batch' \| 'total_blocks'  \| 'average_block_time' \| 'total_txs' \| 'total_operational_txs' \| 'latest_l1_state_batch' \| 'wallet_addresses' \| 'gas_tracker' \| 'btc_locked' \| 'current_epoch'>` | List of stats widgets displayed on the home page | - | For zkSync and Arbitrum rollups: `['latest_batch','average_block_time','total_txs','wallet_addresses','gas_tracker']`, for other cases: `['total_blocks','average_block_time','total_txs','wallet_addresses','gas_tracker']` | `['total_blocks','total_txs','wallet_addresses']` | v1.35.x+ |
 | NEXT_PUBLIC_HOMEPAGE_HERO_BANNER_CONFIG | `HeroBannerConfig`, see details [below](#hero-banner-configuration-properties) | Configuration of hero banner appearance. | - | - | See [below](#hero-banner-configuration-properties) | v1.35.0+ |
+| NEXT_PUBLIC_HOMEPAGE_HERO_TITLE | `string` | Hero banner H1 title. Takes precedence over `NEXT_PUBLIC_HOMEPAGE_HERO_BANNER_CONFIG.text` and the default `{NETWORK_NAME} explorer` label. | - | - | `GTBS Blockchain Explorer` | Custom |
 | NEXT_PUBLIC_HOMEPAGE_HIGHLIGHTS_CONFIG | `string` | URL of the file (in `.json` format only) that contains the configuration for banners on the application's homepage, showcasing some of its key functionality. See the full config format [below](#highlights-banner-configuration-properties). The config should contain at least 2 banners, but only 3 banners will be visible at the same time. A larger number of banners in the config allows for random banner rotation upon page load. | - | - | See [below](#highlights-banner-configuration-properties) | v2.6.0+ |
 
 #### Hero banner configuration properties

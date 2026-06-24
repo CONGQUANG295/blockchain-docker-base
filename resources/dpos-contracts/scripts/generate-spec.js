@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generate or patch OpenEthereum spec.json for ICSC DPoS bootstrap.
+ * Generate or patch OpenEthereum spec.json for DPoS bootstrap.
  * Phase 1: validator list + premine, no contract addresses.
  * Phase 2: inject Consensus proxy + BlockReward proxy at transition block.
  */
@@ -61,6 +61,69 @@ function normalizeAddress(address) {
   return address.toLowerCase();
 }
 
+function parseBool(value) {
+  if (value === undefined || value === null || value === "") return false;
+  return /^(1|true|yes|on)$/i.test(String(value).trim());
+}
+
+function parseHexQuantity(value, name) {
+  if (!/^0x[0-9a-fA-F]+$/i.test(value)) {
+    throw new Error(`${name} must be a hex quantity (e.g. 0x3B9ACA00)`);
+  }
+  return value;
+}
+
+function applyEip1559(spec, env) {
+  if (!parseBool(env.ENABLE_EIP1559)) {
+    return spec;
+  }
+
+  const transition = env.EIP1559_TRANSITION_BLOCK ?? "0";
+  const baseFeeInitial = parseHexQuantity(
+    env.EIP1559_BASE_FEE_INITIAL_VALUE || "0x3B9ACA00",
+    "EIP1559_BASE_FEE_INITIAL_VALUE"
+  );
+  const maxChangeDenominator = parseHexQuantity(
+    env.EIP1559_BASE_FEE_MAX_CHANGE_DENOMINATOR || "0x8",
+    "EIP1559_BASE_FEE_MAX_CHANGE_DENOMINATOR"
+  );
+  const elasticityMultiplier = parseHexQuantity(
+    env.EIP1559_ELASTICITY_MULTIPLIER || "0x2",
+    "EIP1559_ELASTICITY_MULTIPLIER"
+  );
+
+  spec.params.eip1559Transition = transition;
+  spec.params.eip3198Transition = transition;
+  spec.params.eip3529Transition = transition;
+  spec.params.eip3541Transition = transition;
+  spec.params.eip1559BaseFeeMaxChangeDenominator = maxChangeDenominator;
+  spec.params.eip1559ElasticityMultiplier = elasticityMultiplier;
+  spec.params.eip1559BaseFeeInitialValue = baseFeeInitial;
+
+  if (env.EIP1559_BASE_FEE_MIN_VALUE) {
+    const minValue = parseHexQuantity(
+      env.EIP1559_BASE_FEE_MIN_VALUE,
+      "EIP1559_BASE_FEE_MIN_VALUE"
+    );
+    spec.params.eip1559BaseFeeMinValue = minValue;
+    spec.params.eip1559BaseFeeMinValueTransition =
+      env.EIP1559_BASE_FEE_MIN_VALUE_TRANSITION || transition;
+  }
+
+  if (env.EIP1559_FEE_COLLECTOR) {
+    const collector = normalizeAddress(env.EIP1559_FEE_COLLECTOR);
+    spec.params.eip1559FeeCollector = collector;
+    spec.params.eip1559FeeCollectorTransition =
+      env.EIP1559_FEE_COLLECTOR_TRANSITION || transition;
+  }
+
+  if (String(transition) === "0") {
+    spec.genesis.baseFeePerGas = baseFeeInitial;
+  }
+
+  return spec;
+}
+
 function buildPhase1(env, validatorAddress) {
   const template = loadTemplate();
   const networkName = requireField(env, "NETWORK_NAME");
@@ -105,7 +168,7 @@ function buildPhase1(env, validatorAddress) {
     [validator]: { balance: validatorBalance },
   };
 
-  return template;
+  return applyEip1559(template, env);
 }
 
 function buildPhase2(spec, consensusProxy, blockRewardProxy, transitionBlock) {

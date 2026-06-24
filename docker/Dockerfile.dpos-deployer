@@ -1,8 +1,13 @@
 FROM node:18
 
-WORKDIR /work
+COPY resources/custom-staking-contracts/ /gtbs/
+WORKDIR /gtbs
+RUN npm install \
+  && node scripts/generate-gtbs-config.js \
+  && npm run compile
 
-COPY resources/icsc-dpos-contracts/ ./
+WORKDIR /work
+COPY resources/dpos-contracts/ ./
 
 ENV DPOS_CONTRACT_ENV=/work/env/dpos.contract.env.example
 
@@ -10,4 +15,7 @@ RUN yarn install --frozen-lockfile \
   && node scripts/generate-contract-config.js \
   && yarn compile
 
-ENTRYPOINT ["npx", "hardhat", "run"]
+COPY resources/custom-staking-contracts/docker/deploy-entrypoint.sh /deploy-entrypoint.sh
+RUN chmod +x /deploy-entrypoint.sh
+
+ENTRYPOINT ["/deploy-entrypoint.sh"]

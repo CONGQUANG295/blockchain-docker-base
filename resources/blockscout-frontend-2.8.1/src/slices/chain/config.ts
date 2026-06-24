@@ -31,6 +31,10 @@ const rpcUrls = (() => {
   return Array.isArray(parsedValue) ? parsedValue : [];
 })();
 
+const consensusAddress = getEnvValue('NEXT_PUBLIC_CONSENSUS_ADDRESS') || undefined;
+const blockTimeSeconds = Number(getEnvValue('NEXT_PUBLIC_BLOCK_TIME_SECONDS')) || 5;
+const validatorsStatusUrl = getEnvValue('NEXT_PUBLIC_VALIDATORS_STATUS_URL') || undefined;
+
 const chain = Object.freeze({
   id: getEnvValue('NEXT_PUBLIC_NETWORK_ID'),
   name: getEnvValue('NEXT_PUBLIC_NETWORK_NAME'),
@@ -55,6 +59,9 @@ const chain = Object.freeze({
     dark: getExternalAssetFilePath('NEXT_PUBLIC_NETWORK_ICON_DARK'),
   },
   rpcUrls,
+  consensusAddress,
+  blockTimeSeconds,
+  validatorsStatusUrl,
   isTestnet: getEnvValue('NEXT_PUBLIC_IS_TESTNET') === 'true',
   verificationType,
   indexingStatus: {

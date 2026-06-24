@@ -1,0 +1,14 @@
+{
+  "name": "staking-keeper",
+  "version": "0.1.0",
+  "description": "GTBS staking keeper — batch completeUnstake / claimVested",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "pino": "^8.19.0",
+    "web3": "^1.10.4"
+  }
+}

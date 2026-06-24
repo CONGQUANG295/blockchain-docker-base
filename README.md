@@ -26,11 +26,20 @@ youruser/blockchain-dock-blockscout-backend:11.2.1
 
 ## Build locally
 
-All images (same as CI):
+All images (same as CI push to main):
 
 ```bash
 chmod +x scripts/build-and-push.sh
 ./scripts/build-and-push.sh
+```
+
+Build by group (`group` field in `images.manifest.json`):
+
+```bash
+./scripts/build-and-push.sh --chain          # openethereum, validator-app, dpos-deployer, ...
+./scripts/build-and-push.sh --explorer       # Blockscout backend/frontend (v11 + legacy)
+./scripts/build-and-push.sh --dapps          # netstats-dashboard, eth-faucet, docs-poa
+./scripts/build-and-push.sh --explorer --dapps   # combine groups
 ```
 
 Build and push to Docker Hub:
@@ -38,7 +47,10 @@ Build and push to Docker Hub:
 ```bash
 docker login
 ./scripts/build-and-push.sh --push --namespace your-dockerhub-username
+./scripts/build-and-push.sh --explorer --push --namespace your-dockerhub-username
 ```
+
+GitHub Actions `workflow_dispatch` exposes the same three group toggles (`build_chain`, `build_explorer`, `build_dapps`).
 
 ## Image catalog
 

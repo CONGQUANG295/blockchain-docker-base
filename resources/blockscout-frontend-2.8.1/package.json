@@ -135,6 +135,7 @@
     "prom-client": "15.1.1",
     "qrcode": "^1.5.4",
     "react": "19.1.4",
+    "react-circular-progressbar": "^2.1.0",
     "react-device-detect": "^2.2.3",
     "react-dom": "19.1.4",
     "react-google-recaptcha": "3.1.0",

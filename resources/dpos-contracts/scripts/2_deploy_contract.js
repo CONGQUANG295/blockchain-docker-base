@@ -13,10 +13,48 @@ const debug = (msg) => {
   if (DEBUG) console.log(msg);
 };
 
+function parseBool(value) {
+  if (value === undefined || value === null || value === "") return false;
+  return /^(1|true|yes|on)$/i.test(String(value).trim());
+}
+
+async function resolveTxOpts() {
+  if (!parseBool(process.env.ENABLE_EIP1559)) {
+    return {
+      opts: { gasPrice: 0 },
+      mode: "zero gas (EIP-1559 disabled in spec)",
+    };
+  }
+
+  const eip1559Block = Number(process.env.EIP1559_TRANSITION_BLOCK ?? 0);
+  const currentBlock = await ethers.provider.getBlockNumber();
+
+  if (currentBlock < eip1559Block) {
+    return {
+      opts: { gasPrice: 0 },
+      mode: `zero gas (block ${currentBlock} < EIP1559 transition ${eip1559Block})`,
+    };
+  }
+
+  if (process.env.DEPLOY_GAS_PRICE) {
+    return {
+      opts: { gasPrice: process.env.DEPLOY_GAS_PRICE },
+      mode: `EIP-1559 active (block ${currentBlock} >= ${eip1559Block}), DEPLOY_GAS_PRICE override`,
+    };
+  }
+
+  return {
+    opts: {},
+    mode: `EIP-1559 active (block ${currentBlock} >= ${eip1559Block}), network gas price`,
+  };
+}
+
 async function main() {
   const [deployer] = await ethers.getSigners();
+  const { opts: deployTxOpts, mode: gasMode } = await resolveTxOpts();
 
   console.log(`Deploying contracts with the account: ${deployer.address}`);
+  console.log(`Gas mode: ${gasMode}`);
 
   let initialValidatorAddress = INITIAL_VALIDATOR_ADDRESS || ZERO_ADDRESS;
   initialValidatorAddress = ethers.utils.getAddress(initialValidatorAddress);
@@ -40,13 +78,14 @@ async function main() {
   );
 
   // Consensus
-  const consensusImpl = await ConsensusFactory.deploy();
+  const consensusImpl = await ConsensusFactory.deploy(deployTxOpts);
   await consensusImpl.deployed();
   debug(`Consensus Impl: ${consensusImpl.address}`);
 
   const consensusProxy = await EternalStorageProxyFactory.deploy(
     ZERO_ADDRESS,
-    consensusImpl.address
+    consensusImpl.address,
+    deployTxOpts
   );
   await consensusProxy.deployed();
   debug(`Consensus Proxy: ${consensusProxy.address}`);
@@ -54,7 +93,7 @@ async function main() {
   const consensus = ConsensusFactory.attach(consensusProxy.address);
   debug(`Consensus : ${consensus.address}`);
 
-  const tx = await consensus.initialize(initialValidatorAddress);
+  const tx = await consensus.initialize(initialValidatorAddress, deployTxOpts);
   await tx.wait();
 
   assert.equal(
@@ -65,13 +104,14 @@ async function main() {
   debug(`Initial Validator Address: ${initialValidatorAddress}`);
 
   // ProxyStorage
-  const proxyStorageImpl = await ProxyStorageFactory.deploy();
+  const proxyStorageImpl = await ProxyStorageFactory.deploy(deployTxOpts);
   await proxyStorageImpl.deployed();
   debug(`ProxyStorage Impl: ${proxyStorageImpl.address}`);
 
   const storageProxy = await EternalStorageProxyFactory.deploy(
     ZERO_ADDRESS,
-    proxyStorageImpl.address
+    proxyStorageImpl.address,
+    deployTxOpts
   );
   await storageProxy.deployed();
   debug(`ProxyStorage Proxy: ${storageProxy.address}`);
@@ -79,7 +119,7 @@ async function main() {
   const proxyStorage = ProxyStorageFactory.attach(storageProxy.address);
   debug(`ProxyStorage: ${proxyStorage.address}`);
 
-  const tx2 = await proxyStorage.initialize(consensus.address);
+  const tx2 = await proxyStorage.initialize(consensus.address, deployTxOpts);
   await tx2.wait();
   debug(`ProxyStorage - initialize: ${tx2.hash}`);
   assert.equal(
@@ -88,7 +128,7 @@ async function main() {
     "Consensus Mismatch"
   );
 
-  const tx3 = await consensus.setProxyStorage(proxyStorage.address);
+  const tx3 = await consensus.setProxyStorage(proxyStorage.address, deployTxOpts);
   await tx3.wait();
   debug(`Consensus - setProxyStorage: ${tx3.hash}`);
   assert.equal(
@@ -98,13 +138,14 @@ async function main() {
   );
 
   // BlockReward
-  const blockRewardImpl = await BlockRewardFactory.deploy();
+  const blockRewardImpl = await BlockRewardFactory.deploy(deployTxOpts);
   await blockRewardImpl.deployed();
   debug(`BlockReward Impl: ${blockRewardImpl.address}`);
 
   const blockRewardProxy = await EternalStorageProxyFactory.deploy(
     proxyStorage.address,
-    blockRewardImpl.address
+    blockRewardImpl.address,
+    deployTxOpts
   );
   await blockRewardProxy.deployed();
   debug(`BlockReward Proxy: ${blockRewardProxy.address}`);
@@ -112,25 +153,26 @@ async function main() {
   const blockReward = BlockRewardFactory.attach(blockRewardProxy.address);
   debug(`BlockReward : ${blockReward.address}`);
 
-  const tx4 = await blockReward.initialize(initialSupply);
+  const tx4 = await blockReward.initialize(initialSupply, deployTxOpts);
   await tx4.wait();
   debug(`BlockReward - initialize: ${tx4.hash}`);
 
   // Voting
-  const votingImpl = await VotingFactory.deploy();
+  const votingImpl = await VotingFactory.deploy(deployTxOpts);
   await votingImpl.deployed();
   debug(`Voting Impl: ${votingImpl.address}`);
 
   const votingProxy = await EternalStorageProxyFactory.deploy(
     proxyStorage.address,
-    votingImpl.address
+    votingImpl.address,
+    deployTxOpts
   );
   await votingProxy.deployed();
   debug(`Voting Proxy: ${votingProxy.address}`);
 
   const voting = VotingFactory.attach(votingProxy.address);
   debug(`Voting: ${voting.address}`);
-  const tx5 = await voting.initialize();
+  const tx5 = await voting.initialize(deployTxOpts);
   await tx5.wait();
   debug(`Voting - initialize ${tx5.hash}`);
 
@@ -162,7 +204,8 @@ async function main() {
   // Initialize ProxyStorage
   const tx6 = await proxyStorage.initializeAddresses(
     blockReward.address,
-    voting.address
+    voting.address,
+    deployTxOpts
   );
   await tx6.wait();
   assert.equal(

@@ -25,10 +25,13 @@ import LatestBatchStatsWidget from './LatestBatchStatsWidget';
 import LatestBlockStatsWidget from './LatestBlockStatsWidget';
 import StatsDegraded from './StatsDegraded';
 
+import DposHomeStats from 'src/features/dpos-consensus/components/DposHomeStats';
+
 const rollupFeature = config.features.rollup;
 const isOptimisticRollup = rollupFeature.isEnabled && rollupFeature.type === 'optimistic';
 const isArbitrumRollup = rollupFeature.isEnabled && rollupFeature.type === 'arbitrum';
 const isStatsFeatureEnabled = config.features.stats.isEnabled;
+const isDposConsensusEnabled = config.features.dposConsensus.isEnabled;
 
 const Stats = () => {
   const [ hasGasTracker, setHasGasTracker ] = React.useState(config.features.gasTracker.isEnabled);
@@ -191,8 +194,37 @@ const Stats = () => {
       .sort(sortHomeStatsItems);
   })();
 
-  if (items.length === 0) {
+  if (items.length === 0 && !isDposConsensusEnabled) {
     return null;
+  }
+
+  const standardWidgets = items.map((item) => {
+    if ('component' in item) {
+      return <React.Fragment key={ item.id }>{ item.component }</React.Fragment>;
+    }
+
+    return (
+      <StatsWidget
+        key={ item.id }
+        { ...item }
+        { ...homeStatsWidgetCommonStyles }
+        isLoading={ isLoading }
+      />
+    );
+  });
+
+  if (isDposConsensusEnabled) {
+    return (
+      <Grid
+        gridTemplateColumns={{ base: '1fr 1fr', md: '1fr 1fr 1fr' }}
+        gridGap={{ base: 2, md: 4 }}
+        flexBasis="50%"
+        flexGrow={ 1 }
+      >
+        { standardWidgets }
+        <DposHomeStats/>
+      </Grid>
+    );
   }
 
   return (
@@ -202,20 +234,7 @@ const Stats = () => {
       flexBasis="50%"
       flexGrow={ 1 }
     >
-      { items.map((item) => {
-        if ('component' in item) {
-          return <React.Fragment key={ item.id }>{ item.component }</React.Fragment>;
-        }
-
-        return (
-          <StatsWidget
-            key={ item.id }
-            { ...item }
-            { ...homeStatsWidgetCommonStyles }
-            isLoading={ isLoading }
-          />
-        );
-      }) }
+      { standardWidgets }
     </Grid>
   );
 };

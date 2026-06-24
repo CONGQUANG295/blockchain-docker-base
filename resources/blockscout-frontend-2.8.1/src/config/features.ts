@@ -29,6 +29,7 @@ export { default as multichain } from 'src/features/multichain/config';
 export { default as multichainButton } from 'src/features/multichain-button/config';
 export { default as nameServices } from 'src/features/name-services/config';
 export { default as dexPools } from 'src/features/dex-pools/config';
+export { default as dposConsensus } from 'src/features/dpos-consensus/config';
 export { default as rewards } from 'src/features/rewards/config';
 export { default as rollup } from 'src/features/rollup/common/config';
 export { default as safe } from 'src/features/safe/config';

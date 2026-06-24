@@ -2777,28 +2777,28 @@ defmodule Explorer.Chain do
 
   @spec get_token_icon_url_by(String.t(), String.t()) :: String.t() | nil
   def get_token_icon_url_by(chain_id, address_hash) do
-    chain_name =
-      case chain_id do
-        "1" ->
-          "ethereum"
+    case System.get_env("TOKEN_ICON_CHAIN_SLUG") do
+      slug when is_binary(slug) and slug != "" ->
+        base =
+          System.get_env("TOKEN_ICON_ASSETS_BASE_URL") ||
+            "https://raw.githubusercontent.com/zibank8/assets/main/blockchains"
 
-        "99" ->
-          "poa"
+        "#{base}/#{slug}/#{address_hash}/logo.png"
 
-        "100" ->
-          "xdai"
+      _ ->
+        chain_name =
+          case chain_id do
+            "1" -> "ethereum"
+            "99" -> "poa"
+            "100" -> "xdai"
+            _ -> nil
+          end
 
-        _ ->
+        if chain_name do
+          "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/#{chain_name}/assets/#{address_hash}/logo.png"
+        else
           nil
-      end
-
-    if chain_name do
-      try_url =
-        "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/#{chain_name}/assets/#{address_hash}/logo.png"
-
-      try_url
-    else
-      nil
+        end
     end
   end
 

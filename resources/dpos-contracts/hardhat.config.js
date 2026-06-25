@@ -118,21 +118,49 @@ function getSigners() {
   return signers;
 }
 
+function resolveKeystoreDir(configuredDir) {
+  const fs = require("fs");
+  const path = require("path");
+  const candidates = [];
+  if (configuredDir) candidates.push(configuredDir);
+  if (configuredDir && configuredDir.endsWith(`${path.sep}keystore`)) {
+    candidates.push(path.dirname(configuredDir));
+  }
+  candidates.push("/app/keys");
+  const seen = new Set();
+  for (const dir of candidates) {
+    if (!dir || seen.has(dir)) continue;
+    seen.add(dir);
+    try {
+      if (
+        fs.existsSync(dir) &&
+        fs.readdirSync(dir).some((name) => name.startsWith("UTC--"))
+      ) {
+        return dir;
+      }
+    } catch (_) {
+      /* try next candidate */
+    }
+  }
+  return configuredDir || "/app/keys";
+}
+
 function getPrivateKeyFromKeystore(keystoreDir, passwordFile) {
   const fs = require("fs");
   const path = require("path");
   const keythereum = require("keythereum");
 
+  const resolvedDir = resolveKeystoreDir(keystoreDir);
   const password = fs.readFileSync(passwordFile, "utf8").trim();
   const keystoreFile = fs
-    .readdirSync(keystoreDir)
+    .readdirSync(resolvedDir)
     .find((name) => name.startsWith("UTC--"));
   if (!keystoreFile) {
-    throw new Error(`No UTC keystore found in ${keystoreDir}`);
+    throw new Error(`No UTC keystore found in ${resolvedDir}`);
   }
-  const keyobj = keythereum.importFromFile(
-    path.basename(keystoreFile),
-    keystoreDir
+  // keythereum.importFromFile expects datadir/keystore/ — our mount puts UTC--* directly in resolvedDir.
+  const keyobj = JSON.parse(
+    fs.readFileSync(path.join(resolvedDir, keystoreFile), "utf8")
   );
   return keythereum.recover(password, keyobj).toString("hex");
 }

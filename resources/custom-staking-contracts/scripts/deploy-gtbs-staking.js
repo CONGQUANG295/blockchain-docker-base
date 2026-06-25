@@ -54,7 +54,13 @@ async function resolveTxOpts() {
 
 async function main() {
   const cfg = loadGtbsConfig();
-  const [deployer] = await ethers.getSigners();
+  const signers = await ethers.getSigners();
+  if (!signers.length) {
+    throw new Error(
+      "No deployer account — set DEPLOYER_PRIVATE_KEY or mount VALIDATOR_KEYSTORE_DIR + VALIDATOR_PASSWORD_FILE"
+    );
+  }
+  const [deployer] = signers;
   const { opts: deployTxOpts, mode: gasMode } = await resolveTxOpts();
 
   console.log(`Deploying GTBS custom staking with account: ${deployer.address}`);

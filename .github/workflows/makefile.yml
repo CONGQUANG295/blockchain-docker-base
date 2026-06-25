@@ -1,0 +1,25 @@
+name: Makefile
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'Makefile'
+      - '.github/workflows/makefile.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'Makefile'
+      - '.github/workflows/makefile.yml'
+
+jobs:
+  makefile-syntax:
+    name: Validate Makefile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify Makefile parses
+        run: |
+          make -n help
+          make -n build-chain

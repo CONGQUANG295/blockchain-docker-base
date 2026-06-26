@@ -30,33 +30,40 @@ export default function useDposConsensusStats() {
   const blockTimeSeconds = chainConfig.blockTimeSeconds;
 
   const refresh = React.useCallback(async() => {
-    try {
-      const [
-        staked,
-        activeValidators,
-        [ cycleStart, cycleEnd ],
-        cycleEndInSeconds,
-      ] = await Promise.all([
-        getTotalStaked(),
-        getActiveValidators(),
-        getCurrentCycleBlocks(),
-        getCycleEndSeconds(blockTimeSeconds),
-      ]);
+    const [
+      stakedResult,
+      validatorsResult,
+      cycleBlocksResult,
+      cycleEndResult,
+    ] = await Promise.allSettled([
+      getTotalStaked(),
+      getActiveValidators(),
+      getCurrentCycleBlocks(),
+      getCycleEndSeconds(blockTimeSeconds),
+    ]);
 
+    if (stakedResult.status === 'fulfilled') {
+      setTotalStaked(stakedResult.value);
+    }
+
+    if (validatorsResult.status === 'fulfilled') {
+      setValidators(validatorsResult.value);
+    }
+
+    if (cycleBlocksResult.status === 'fulfilled') {
+      const [ cycleStart, cycleEnd ] = cycleBlocksResult.value;
       const start = Number(cycleStart);
       const end = Number(cycleEnd);
-      const length = calcCycleLengthSeconds(start, end, blockTimeSeconds);
-
-      setTotalStaked(staked);
-      setValidators(activeValidators);
       setStartBlock(start);
       setEndBlock(end);
-      setCycleEndSeconds(Math.max(0, cycleEndInSeconds));
-      setCycleLengthSeconds(length);
-      setIsLoading(false);
-    } catch {
-      setIsLoading(false);
+      setCycleLengthSeconds(calcCycleLengthSeconds(start, end, blockTimeSeconds));
     }
+
+    if (cycleEndResult.status === 'fulfilled') {
+      setCycleEndSeconds(Math.max(0, cycleEndResult.value));
+    }
+
+    setIsLoading(false);
   }, [ blockTimeSeconds ]);
 
   React.useEffect(() => {

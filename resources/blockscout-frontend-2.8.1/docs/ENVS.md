@@ -451,6 +451,7 @@ Also, be aware that if you customize the name of the currency or any of its deno
 | NEXT_PUBLIC_NETWORK_ID | `number` | Chain id, see [https://chainlist.org](https://chainlist.org) for the reference | Required (except for multichain) | - | `99` | v1.0.x+ |
 | NEXT_PUBLIC_NETWORK_RPC_URL | `string \| Array<string>` | Chain public RPC server url, see [https://chainlist.org](https://chainlist.org) for the reference. Can contain a single string value, or an array of urls. | - | - | `https://core.poa.network` | v1.0.x+ |
 | NEXT_PUBLIC_CONSENSUS_ADDRESS | `string` | DPoS consensus contract address. When set (with `NEXT_PUBLIC_NETWORK_RPC_URL`), enables on-chain homepage widgets (staked, validators, cycle). | - | - | `0x1234...abcd` | Custom |
+| NEXT_PUBLIC_STAKING_VAULT_ADDRESS | `string` | GTBS StakingVault contract address. When set, total staked includes vault balance (custom staking profile). | - | - | `0x1234...abcd` | Custom |
 | NEXT_PUBLIC_BLOCK_TIME_SECONDS | `number` | Block time in seconds for DPoS cycle countdown and gauge. Should match chain `BLOCK_TIME_SECONDS`. | - | `5` | `5` | Custom |
 | NEXT_PUBLIC_VALIDATORS_STATUS_URL | `string` | Optional URL for the Active Validators stats widget link. | - | - | `https://status.example.com` | Custom |
 | NEXT_PUBLIC_DPOS_GAUGE_COLOR | `string` | CSS color for the DPoS cycle progress gauge. | - | `#FFC107` | `#FFC107` | Custom |

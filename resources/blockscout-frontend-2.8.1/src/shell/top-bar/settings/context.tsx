@@ -2,13 +2,25 @@
 
 import React from 'react';
 
-import { ADDRESS_FORMATS, type AddressFormat } from 'src/slices/address/types/config';
+import { type AddressFormat } from 'src/slices/address/types/config';
 
+import config from 'src/config';
 import { useAppContext } from 'src/shell/app/context';
 
 import * as cookies from 'src/shared/storage/cookies';
 
 import type { TimeFormat } from './time-format/utils';
+
+const availableAddressFormats = config.slices.address.hashFormat.availableFormats;
+const defaultAddressFormat: AddressFormat = availableAddressFormats[0] ?? 'base16';
+
+function resolveAddressFormat(cookieValue: string | undefined): AddressFormat {
+  if (cookieValue && availableAddressFormats.includes(cookieValue as AddressFormat)) {
+    return cookieValue as AddressFormat;
+  }
+
+  return defaultAddressFormat;
+}
 
 interface SettingsProviderProps {
   children: React.ReactNode;
@@ -30,8 +42,14 @@ export function SettingsContextProvider({ children }: SettingsProviderProps) {
   const initialAddressFormat = cookies.get(cookies.NAMES.ADDRESS_FORMAT, appCookies);
 
   const [ addressFormat, setAddressFormat ] = React.useState<AddressFormat>(
-    initialAddressFormat && ADDRESS_FORMATS.includes(initialAddressFormat as AddressFormat) ? initialAddressFormat as AddressFormat : 'base16',
+    () => resolveAddressFormat(initialAddressFormat),
   );
+
+  React.useEffect(() => {
+    if (!initialAddressFormat || !availableAddressFormats.includes(initialAddressFormat as AddressFormat)) {
+      cookies.set(cookies.NAMES.ADDRESS_FORMAT, defaultAddressFormat);
+    }
+  }, [ initialAddressFormat ]);
 
   const [ timeFormat, setTimeFormat ] = React.useState<TimeFormat>(
     cookies.get(cookies.NAMES.TIME_FORMAT, appCookies) as TimeFormat || 'relative',

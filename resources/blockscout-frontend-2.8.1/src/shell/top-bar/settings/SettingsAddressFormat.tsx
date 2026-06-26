@@ -22,7 +22,7 @@ const SettingsAddressFormat = () => {
   return (
     <Switch
       id="address-format"
-      defaultChecked={ addressFormat === 'bech32' }
+      checked={ addressFormat === 'bech32' }
       onChange={ toggleAddressFormat }
       mt={ 4 }
       direction="rtl"

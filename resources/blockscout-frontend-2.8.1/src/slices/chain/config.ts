@@ -32,6 +32,7 @@ const rpcUrls = (() => {
 })();
 
 const consensusAddress = getEnvValue('NEXT_PUBLIC_CONSENSUS_ADDRESS') || undefined;
+const stakingVaultAddress = getEnvValue('NEXT_PUBLIC_STAKING_VAULT_ADDRESS') || undefined;
 const blockTimeSeconds = Number(getEnvValue('NEXT_PUBLIC_BLOCK_TIME_SECONDS')) || 5;
 const validatorsStatusUrl = getEnvValue('NEXT_PUBLIC_VALIDATORS_STATUS_URL') || undefined;
 
@@ -60,6 +61,7 @@ const chain = Object.freeze({
   },
   rpcUrls,
   consensusAddress,
+  stakingVaultAddress,
   blockTimeSeconds,
   validatorsStatusUrl,
   isTestnet: getEnvValue('NEXT_PUBLIC_IS_TESTNET') === 'true',

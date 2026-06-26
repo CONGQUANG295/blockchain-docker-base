@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LicenseRef-Blockscout
 
-import { createPublicClient, formatUnits, http, type Address } from 'viem';
+import { createPublicClient, http, type Address } from 'viem';
 
 import chainConfig from 'src/slices/chain/config';
 
@@ -17,6 +17,11 @@ function getClient() {
 
 const address = () => chainConfig.consensusAddress as Address;
 
+/** Consensus.DECIMALS is 10**18 (wei factor), not the decimal digit count. */
+function tokensFromWei(wei: bigint, weiFactor: bigint): number {
+  return Number(wei) / Number(weiFactor);
+}
+
 export async function getActiveValidators(): Promise<number> {
   const client = getClient();
   const validators = await client.readContract({
@@ -30,14 +35,41 @@ export async function getActiveValidators(): Promise<number> {
 
 export async function getTotalStaked(): Promise<number> {
   const client = getClient();
-  const decimals = await client.readContract({
-    address: address(),
+  const consensus = address();
+  const weiFactor = await client.readContract({
+    address: consensus,
     abi: CONSENSUS_ABI,
     functionName: 'DECIMALS',
   }) as bigint;
-  const balance = await client.getBalance({ address: address() });
 
-  return Number(formatUnits(balance, Number(decimals)));
+  const [ consensusBalance, validators ] = await Promise.all([
+    client.getBalance({ address: consensus }),
+    client.readContract({
+      address: consensus,
+      abi: CONSENSUS_ABI,
+      functionName: 'getValidators',
+    }) as Promise<Array<Address>>,
+  ]);
+
+  const stakeAmounts = await Promise.all(
+    validators.map((validator) =>
+      client.readContract({
+        address: consensus,
+        abi: CONSENSUS_ABI,
+        functionName: 'stakeAmount',
+        args: [ validator ],
+      }) as Promise<bigint>,
+    ),
+  );
+
+  let totalWei = consensusBalance + stakeAmounts.reduce((sum, amount) => sum + amount, BigInt(0));
+
+  const vaultAddress = chainConfig.stakingVaultAddress;
+  if (vaultAddress) {
+    totalWei += await client.getBalance({ address: vaultAddress as Address });
+  }
+
+  return tokensFromWei(totalWei, weiFactor);
 }
 
 export async function getCurrentCycleBlocks(): Promise<[ bigint, bigint ]> {

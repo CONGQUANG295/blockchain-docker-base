@@ -55,6 +55,10 @@ export default yup.object({
       message: 'NEXT_PUBLIC_CONSENSUS_ADDRESS must be a valid Ethereum address',
       excludeEmptyString: true,
     }),
+    NEXT_PUBLIC_STAKING_VAULT_ADDRESS: yup.string().matches(/^0x[a-fA-F0-9]{40}$/, {
+      message: 'NEXT_PUBLIC_STAKING_VAULT_ADDRESS must be a valid Ethereum address',
+      excludeEmptyString: true,
+    }),
     NEXT_PUBLIC_BLOCK_TIME_SECONDS: yup.number().positive().integer(),
     NEXT_PUBLIC_VALIDATORS_STATUS_URL: yup.string().test(urlTest),
 });

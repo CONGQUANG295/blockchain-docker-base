@@ -63,6 +63,7 @@ minimumReleaseAgeExclude:
   - '@blockscout/visualizer-types'
   - '@blockscout/zetachain-cctx-types'
   # remove after 20.06.2026
+  - axios
   - form-data@4.0.6
   - '@opentelemetry/core@2.8.0'
   - '@opentelemetry/sdk-trace-node@2.8.0'

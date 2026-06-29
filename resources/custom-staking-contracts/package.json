@@ -5,7 +5,9 @@
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "generate-config": "node scripts/generate-gtbs-config.js"
+    "generate-config": "node scripts/generate-gtbs-config.js",
+    "generate-contract-config": "node scripts/generate-gtbs-contract-config.js",
+    "flatten": "bash commands/flatten.sh"
   },
   "license": "MIT",
   "dependencies": {

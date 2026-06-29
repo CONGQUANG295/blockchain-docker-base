@@ -23,8 +23,7 @@ contract("GTBS owner config", (accounts) => {
 
   it("reverts out-of-bounds owner setters", async () => {
     await vault.setUnstakeFeeBps(2500, { from: owner }).should.be.rejected;
-    await consensus.setMinDelegation(toWei(toBN(1), "ether"), { from: owner }).should.be.rejected;
-    await blockReward.setNetApyBps(50, { from: owner }).should.be.rejected;
+    await blockReward.setNetApyBps(1001, { from: owner }).should.be.rejected;
   });
 
   it("keeps pending unstake escrow at 90% after owner raises fee", async () => {

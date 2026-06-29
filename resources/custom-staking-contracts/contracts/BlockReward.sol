@@ -14,9 +14,11 @@ contract BlockReward is EternalStorage, BlockRewardBase {
   using SafeMath for uint256;
 
   uint256 public constant DECIMALS = 10 ** 18;
-  uint256 public constant BLOCKS_PER_YEAR = 6307200;
+  uint256 public constant BLOCKS_PER_YEAR = 10512000; // patched by generate-gtbs-contract-config.js
+  uint256 public constant MAX_SUPPLY = 3000000000000000000000000000; // patched by generate-gtbs-contract-config.js
 
   event NetApyBpsUpdated(uint256 value, uint256 effectiveBlock);
+  event MaxSupplyReached();
 
   /**
   * @dev This event will be emitted every block, describing the rewards given
@@ -68,7 +70,8 @@ contract BlockReward is EternalStorage, BlockRewardBase {
   */
   function initialize(uint256 _supply, uint256 _netApyBps) external onlyOwner {
     require(!isInitialized());
-    require(_netApyBps >= 100 && _netApyBps <= 1000);
+    require(_supply < MAX_SUPPLY);
+    require(_netApyBps <= 1000);
     _setSystemAddress(0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE);
     _setTotalSupply(_supply);
     _initRewardedOnCycle();
@@ -84,7 +87,7 @@ contract BlockReward is EternalStorage, BlockRewardBase {
   }
 
   function setNetApyBps(uint256 _bps) external onlyOwner {
-    require(_bps >= 100 && _bps <= 1000);
+    require(_bps <= 1000);
     uintStorage[NET_APY_BPS_NEXT] = _bps;
     uintStorage[NET_APY_ACTIVATION_BLOCK] = block.number + 1;
     emit NetApyBpsUpdated(_bps, block.number + 1);
@@ -102,6 +105,13 @@ contract BlockReward is EternalStorage, BlockRewardBase {
     require(kind[0] == 0);
 
     uint256 blockRewardAmount = getBlockRewardAmountPerValidator(benefactors[0]);
+    uint256 remaining = MAX_SUPPLY.sub(getTotalSupply());
+    if (remaining == 0) {
+      blockRewardAmount = 0;
+    } else if (blockRewardAmount > remaining) {
+      blockRewardAmount = remaining;
+      emit MaxSupplyReached();
+    }
 
     (address[] memory _delegators, uint256[] memory _rewards) = IConsensus(ProxyStorage(getProxyStorage()).getConsensus()).getDelegatorsForRewardDistribution(benefactors[0], blockRewardAmount);
 
@@ -161,6 +171,15 @@ contract BlockReward is EternalStorage, BlockRewardBase {
 
   function getTotalSupply() public view returns(uint256) {
     return uintStorage[TOTAL_SUPPLY];
+  }
+
+  function getMaxSupply() public pure returns(uint256) {
+    return MAX_SUPPLY;
+  }
+
+  function getRemainingMiningBudget() public view returns(uint256) {
+    uint256 ts = getTotalSupply();
+    return ts >= MAX_SUPPLY ? 0 : MAX_SUPPLY.sub(ts);
   }
 
   function _initRewardedOnCycle() private {

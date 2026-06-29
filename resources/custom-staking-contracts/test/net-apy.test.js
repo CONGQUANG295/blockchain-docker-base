@@ -7,8 +7,6 @@ const {
 } = require("./helpers");
 const { toBN, toWei } = web3.utils;
 
-const BLOCKS_PER_YEAR = 6307200;
-
 contract("GTBS NET APY", (accounts) => {
   let blockReward;
   let vault;
@@ -32,6 +30,7 @@ contract("GTBS NET APY", (accounts) => {
   });
 
   it("emits NET delegator reward without extra validator fee cut", async () => {
+    const blocksPerYear = await blockReward.getBlocksPerYear();
     const blockRewardAmount = await blockReward.getBlockRewardAmountPerValidator(
       validator
     );
@@ -49,7 +48,7 @@ contract("GTBS NET APY", (accounts) => {
     const expectedDelegator = stake
       .mul(toBN(400))
       .div(toBN(10000))
-      .div(toBN(BLOCKS_PER_YEAR));
+      .div(blocksPerYear);
     rewards[delegatorIndex].should.be.bignumber.equal(expectedDelegator);
 
     const validatorIndex = receivers.indexOf(validator);

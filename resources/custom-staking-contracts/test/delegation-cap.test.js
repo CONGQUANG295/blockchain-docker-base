@@ -24,9 +24,16 @@ contract("GTBS delegation caps", (accounts) => {
     await revertSnapshot(snapshot);
   });
 
-  it("rejects delegation below minimum", async () => {
-    const low = toWei(toBN(5000), "ether");
+  it("rejects delegation below MIN_STAKE", async () => {
+    const low = toWei(toBN(99999), "ether");
     await vault.delegate(validator, { from: delegator, value: low }).should.be.rejected;
+  });
+
+  it("delegation limits equal MIN_STAKE and MAX_STAKE", async () => {
+    const minStake = await consensus.getMinStake();
+    const maxStake = await consensus.getMaxStake();
+    (await consensus.minDelegation()).should.be.bignumber.equal(minStake);
+    (await consensus.maxDelegationPerWallet()).should.be.bignumber.equal(maxStake);
   });
 
   it("enforces 1:1 delegation cap vs self-stake", async () => {
@@ -34,15 +41,6 @@ contract("GTBS delegation caps", (accounts) => {
     const extra = toWei(toBN(1), "ether");
     await vault.delegate(validator, { from: delegator, value: cap }).should.be.fulfilled;
     await vault.delegate(validator, { from: delegator2, value: extra }).should.be.rejected;
-  });
-
-  it("enforces max delegation per wallet across validators", async () => {
-    const validator2 = accounts[3];
-    await vault.stake({ from: validator2, value: toWei(toBN(100000), "ether") });
-    const ninetyK = toWei(toBN(90000), "ether");
-    const twentyK = toWei(toBN(20000), "ether");
-    await vault.delegate(validator, { from: delegator, value: ninetyK }).should.be.fulfilled;
-    await vault.delegate(validator2, { from: delegator, value: twentyK }).should.be.rejected;
   });
 
   it("blocks direct consensus stake from EOA", async () => {

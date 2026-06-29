@@ -1,14 +1,14 @@
 {
   "minStakeWei": "100000000000000000000000",
   "maxStakeWei": "300000000000000000000000000",
-  "minDelegationWei": "10000000000000000000000",
-  "maxDelegationPerWalletWei": "100000000000000000000000",
   "netApyBps": 400,
   "annualUnlockCapWei": "500000000000000000000000",
   "unstakeFeeBps": 1000,
   "delegatorLockSeconds": 15552000,
   "annualUnlockPeriodSeconds": 31536000,
   "releaseDelaySeconds": 2592000,
-  "blockTimeSeconds": 1,
-  "blocksPerYear": 31536000
+  "blockTimeSeconds": 3,
+  "blocksPerYear": 10512000,
+  "maxSupplyWei": "3000000000000000000000000000",
+  "premineWei": "1500000000000000000000000000"
 }

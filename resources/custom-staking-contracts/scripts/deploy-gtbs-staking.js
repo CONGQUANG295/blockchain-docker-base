@@ -73,6 +73,21 @@ async function main() {
 
   const initialSupply = ethers.utils.parseUnits(INITIAL_SUPPLY_GWEI || "0", "gwei");
 
+  if (cfg.maxSupplyWei) {
+    const maxSupply = ethers.BigNumber.from(cfg.maxSupplyWei);
+    assert.isTrue(
+      initialSupply.lt(maxSupply),
+      "INITIAL_SUPPLY_GWEI must be less than MAX_SUPPLY_WEI"
+    );
+    if (cfg.premineWei) {
+      assert.equal(
+        initialSupply.toString(),
+        cfg.premineWei,
+        "INITIAL_SUPPLY must match PREMINE_BALANCE_WEI"
+      );
+    }
+  }
+
   const ConsensusFactory = await ethers.getContractFactory("Consensus");
   const ProxyStorageFactory = await ethers.getContractFactory("ProxyStorage");
   const BlockRewardFactory = await ethers.getContractFactory("BlockReward");
@@ -90,13 +105,6 @@ async function main() {
   await consensusProxy.deployed();
   const consensus = ConsensusFactory.attach(consensusProxy.address);
   await (await consensus.initialize(initialValidatorAddress, deployTxOpts)).wait();
-  await (
-    await consensus.initializeCustomParams(
-      cfg.minDelegationWei,
-      cfg.maxDelegationPerWalletWei,
-      deployTxOpts
-    )
-  ).wait();
 
   const proxyStorageImpl = await ProxyStorageFactory.deploy(deployTxOpts);
   await proxyStorageImpl.deployed();
@@ -122,6 +130,15 @@ async function main() {
   await (
     await blockReward.initialize(initialSupply, cfg.netApyBps, deployTxOpts)
   ).wait();
+
+  if (cfg.maxSupplyWei) {
+    const maxOnChain = await blockReward.getMaxSupply();
+    assert.equal(
+      maxOnChain.toString(),
+      cfg.maxSupplyWei,
+      "BlockReward MAX_SUPPLY mismatch vs env"
+    );
+  }
 
   const votingImpl = await VotingFactory.deploy(deployTxOpts);
   await votingImpl.deployed();

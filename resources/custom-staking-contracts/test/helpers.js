@@ -7,8 +7,8 @@ require("chai")
 
 exports.ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 exports.MIN_STAKE = toWei(toBN(100000), "ether");
-exports.MIN_DELEGATION = toWei(toBN(10000), "ether");
-exports.MAX_DELEGATION_PER_WALLET = toWei(toBN(100000), "ether");
+exports.MIN_DELEGATION = exports.MIN_STAKE;
+exports.MAX_DELEGATION_PER_WALLET = toWei(toBN(300000000), "ether");
 exports.SYSTEM_ADDRESS = "0xffffFFFfFFffffffffffffffFfFFFfffFFFfFFfE";
 
 exports.impersonateSystem = async () => {
@@ -64,7 +64,7 @@ exports.advanceBlocks = async (n) => {
   }
 };
 
-exports.deployGtbsStack = async (accounts) => {
+exports.deployGtbsStack = async (accounts, options = {}) => {
   const owner = accounts[0];
   const Consensus = artifacts.require("Consensus");
   const ProxyStorage = artifacts.require("ProxyStorage");
@@ -73,17 +73,20 @@ exports.deployGtbsStack = async (accounts) => {
   const StakingVault = artifacts.require("StakingVault");
   const EternalStorageProxy = artifacts.require("EternalStorageProxy");
 
-  const LOCK_SECONDS = 180 * 86400;
-  const UNLOCK_PERIOD = 365 * 86400;
-  const RELEASE_DELAY = 30 * 86400;
-  const UNLOCK_CAP = toWei(toBN(500000), "ether");
-  const NET_APY_BPS = 400;
+  const LOCK_SECONDS = options.delegatorLockSeconds || 180 * 86400;
+  const UNLOCK_PERIOD = options.annualUnlockPeriodSeconds || 365 * 86400;
+  const RELEASE_DELAY = options.releaseDelaySeconds || 30 * 86400;
+  const UNLOCK_CAP = options.annualUnlockCapWei || toWei(toBN(500000), "ether");
+  const NET_APY_BPS = options.netApyBps !== undefined ? options.netApyBps : 400;
+  const initialSupply =
+    options.initialSupply !== undefined
+      ? options.initialSupply
+      : toWei(toBN(300000000), "gwei");
 
   const consensusImpl = await Consensus.new();
   let proxy = await EternalStorageProxy.new(exports.ZERO_ADDRESS, consensusImpl.address);
   const consensus = await Consensus.at(proxy.address);
   await consensus.initialize(owner);
-  await consensus.initializeCustomParams(exports.MIN_DELEGATION, exports.MAX_DELEGATION_PER_WALLET);
 
   const proxyStorageImpl = await ProxyStorage.new();
   proxy = await EternalStorageProxy.new(exports.ZERO_ADDRESS, proxyStorageImpl.address);
@@ -94,7 +97,7 @@ exports.deployGtbsStack = async (accounts) => {
   const blockRewardImpl = await BlockReward.new();
   proxy = await EternalStorageProxy.new(proxyStorage.address, blockRewardImpl.address);
   const blockReward = await BlockReward.at(proxy.address);
-  await blockReward.initialize(toWei(toBN(300000000), "gwei"), NET_APY_BPS);
+  await blockReward.initialize(initialSupply, NET_APY_BPS);
 
   const votingImpl = await Voting.new();
   proxy = await EternalStorageProxy.new(proxyStorage.address, votingImpl.address);
